@@ -37,10 +37,8 @@ class MyApp extends StatelessWidget {
         textSelectionTheme: const TextSelectionThemeData(
           cursorColor: Colors.black,
           selectionColor: Colors.blue,
-
           // selectionHandleColor: Colors.blue,
         ),
-
         // textTheme: TextTheme()
         // textTheme: Theme.of(context).textTheme.apply(
         //       bodyColor: Colors.black,
