@@ -6,8 +6,11 @@ import 'package:store_api_flutter_course/consts/global_colors.dart';
 import 'package:store_api_flutter_course/screens/categories_screen.dart';
 import 'package:store_api_flutter_course/screens/feeds_screen.dart';
 import 'package:store_api_flutter_course/screens/users_screen.dart';
+import 'package:store_api_flutter_course/services/api_handler.dart';
 
+import '../models/products_model.dart';
 import '../widgets/appbar_icons.dart';
+import '../widgets/feeds_grid.dart';
 import '../widgets/feeds_widget.dart';
 import '../widgets/sale_widget.dart';
 
@@ -20,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late TextEditingController _textEditingController;
+  // List<ProductsModel> productsList = [];
   @override
   void initState() {
     _textEditingController = TextEditingController();
@@ -31,6 +35,17 @@ class _HomeScreenState extends State<HomeScreen> {
     _textEditingController.dispose();
     super.dispose();
   }
+
+  // @override
+  // void didChangeDependencies() {
+  //   getProducts();
+  //   super.didChangeDependencies();
+  // }
+
+  // Future<void> getProducts() async {
+  //   productsList = await APIHandler.getAllProducts();
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +116,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         IconlyLight.search,
                         color: lightIconsColor,
                       )),
-                ), const SizedBox(
+                ),
+                const SizedBox(
                   height: 18,
                 ),
                 Expanded(
@@ -147,19 +163,27 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-                      GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: 3,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 0.0,
-                                  mainAxisSpacing: 0.0,
-                                  childAspectRatio: 0.7),
-                          itemBuilder: (ctx, index) {
-                            return const FeedsWidget();
-                          })
+                      FutureBuilder<List<ProductsModel>>(
+                          future: APIHandler.getAllProducts(limit: "3"),
+                          builder: ((context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else if (snapshot.hasError) {
+                              Center(
+                                child:
+                                    Text("An error occured ${snapshot.error}"),
+                              );
+                            } else if (snapshot.data == null) {
+                              const Center(
+                                child: Text("No products has been added yet"),
+                              );
+                            }
+                            return FeedsGridWidget(
+                                productsList: snapshot.data!);
+                          }))
                     ]),
                   ),
                 )
